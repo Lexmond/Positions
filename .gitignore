@@ -1,0 +1,11 @@
+input/*.fasta
+
+output/*
+
+output_old/
+
+Chat.md
+
+*.fasta
+
+tryouts.ipynb
