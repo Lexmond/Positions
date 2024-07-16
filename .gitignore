@@ -11,3 +11,5 @@ Chat.md
 tryouts.ipynb
 
 .DS_Store
+
+.gitignore
