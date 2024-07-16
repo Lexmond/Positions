@@ -9,3 +9,5 @@ Chat.md
 *.fasta
 
 tryouts.ipynb
+
+.DS_Store
