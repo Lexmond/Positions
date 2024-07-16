@@ -12,7 +12,6 @@ input
 ├── sequences_h3n2_ha.fasta  
 ├── sequences_h3n2_na.fasta  
 ├── sequences_h3n2_pa.fasta  
-├── sequences_h5n1_ha.fasta  
 ├── sequences_vic_ha.fasta  
 ├── sequences_vic_na.fasta  
 └── sequences_vic_pa.fasta  
