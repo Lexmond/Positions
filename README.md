@@ -21,6 +21,6 @@ input
 Initiate by running:
 
 ```
-Snakemake --dryrun  --cores 'all'
+Snakemake --cores 'all'
 ```
 
