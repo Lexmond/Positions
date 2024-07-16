@@ -18,7 +18,7 @@ input
 
 
 ## Snakefile
-Initiate by running:
+Initiate by running in terminal:
 
 ```
 Snakemake --cores 'all'
