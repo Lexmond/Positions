@@ -38,7 +38,7 @@ input_data_nextalign = input_func_nextalign()
 # Create a list of tuples that can be used to extract zipped values from the different lists
 list_of_tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign['segment']))
 
-nextclade_output_files = [f"output/nextclade/flu/{lineage}/{segment}/nextclade.aligned.fasta" for lineage, segment in list_of_tuples]
+nextclade_output_files = [f"output/nextclade/flu/{lineage}/{segment}/nextclade.csv" for lineage, segment in list_of_tuples]
 print(f"All output files for Nextclade: \n {nextclade_output_files} \n")
 
 glycosylation_output_files = [f"output/nextclade/flu/{lineage}/ha/glycosylation_sites_HA1.csv" for lineage in input_data_nextalign['lineage']]
@@ -53,10 +53,10 @@ rule all:
 # Run Nextclade datasets on the input sequences to get outputs per subtype and segment 
 rule run_nextclade:
     input:
-        fasta="input/sequences_{lineage}_{segment}.fasta",
-        dataset="library/nextclade/data/flu/{lineage}/{segment}"
+        fasta = "input/sequences_{lineage}_{segment}.fasta",
+        dataset = "library/nextclade/data/flu/{lineage}/{segment}"
     output:
-        aligned="output/nextclade/flu/{lineage}/{segment}/nextclade.aligned.fasta"
+        csv = "output/nextclade/flu/{lineage}/{segment}/nextclade.csv"
     shell:
         """
         nextclade run \
@@ -73,3 +73,4 @@ rule find_glycosylation_sites:
         glycosylation_csv = "output/nextclade/flu/{lineage}/ha/glycosylation_sites_HA1.csv"
     script:
         "library/scripts/find_glycolysation_sites.py"
+
