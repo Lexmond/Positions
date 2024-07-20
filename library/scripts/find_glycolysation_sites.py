@@ -32,6 +32,9 @@ df = pd.DataFrame(results).T
 # Sort the columns (positions) numerically
 df = df.reindex(sorted(df.columns, key=int), axis=1)
 
+# Set the name of the index column
+df.index.name = "seqName"
+
 # Display the DataFrame
 print(df)
 
