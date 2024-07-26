@@ -3,7 +3,10 @@ import pandas as pd
 import re
 
 # Input from Snakefile
-ha_sequences = snakemake.input.fasta_translated
+ha_sequences = str(snakemake.input)
+
+print("This are the ha_sequences: \n")
+print(ha_sequences)
 
 # Output file for Snakefile
 glycosylation_csv = snakemake.output.glycosylation_csv
