@@ -3,10 +3,8 @@ import pandas as pd
 import re
 
 # Input from Snakefile
+# Note that the input from aggregate_translations needs to be converted to a string for SeqIO to work.
 ha_sequences = str(snakemake.input)
-
-print("This are the ha_sequences: \n")
-print(ha_sequences)
 
 # Output file for Snakefile
 glycosylation_csv = snakemake.output.glycosylation_csv
