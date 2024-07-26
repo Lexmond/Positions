@@ -29,6 +29,7 @@ def input_func_nextalign():
 input_data_nextalign = input_func_nextalign()
 
 
+
 # Create lists of tuples that can be used to extract zipped values from the different lists
 list_of_2tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign['segment']))
 list_of_3tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign['segment'], input_data_nextalign['gene']))
@@ -36,15 +37,15 @@ list_of_3tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign
 
 # Create a list of output files for rule nextclade
 nextclade_output_files = [f"output/nextclade/flu/{lineage}/{segment}/nextclade.csv" for lineage, segment in list_of_2tuples]
-print(f"All output files for Nextclade: \n {nextclade_output_files} \n")
+print(f"All output files for 'checkpoint nextclade': \n {nextclade_output_files} \n")
 
 # Create a list of output files for rule glycosylation_sites
-glycosylation_output_files = [f"output/glycosylation/flu/{lineage}/{segment}/glycosylation_sites_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
-print(f"All output files for Glycosylation sites: \n {glycosylation_output_files} \n")
+glycosylation_sites_output_files = [f"output/glycosylation/flu/{lineage}/{segment}/glycosylation_sites_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
+print(f"All output files for rule 'glycosylation_sites': \n {glycosylation_sites_output_files} \n")
 
 # Create a list of output files for rule get_positions
 get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.xlsx" for lineage, segment, gene in list_of_3tuples]
-print(f"All output files for Glycosylation sites: \n {glycosylation_output_files} \n")
+print(f"All output files for rule 'get_positions': \n {get_positions_output_files} \n")
 
 
 
@@ -53,7 +54,7 @@ print(f"All output files for Glycosylation sites: \n {glycosylation_output_files
 rule all:
     input:
         nextclade_output_files,
-        glycosylation_output_files,
+        glycosylation_sites_output_files,
         get_positions_output_files
         
 
