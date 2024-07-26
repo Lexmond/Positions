@@ -29,11 +29,9 @@ def input_func_nextalign():
 input_data_nextalign = input_func_nextalign()
 
 
-
 # Create lists of tuples that can be used to extract zipped values from the different lists
 list_of_2tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign['segment']))
 list_of_3tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign['segment'], input_data_nextalign['gene']))
-
 
 
 # Create a list of output files for rule nextclade
@@ -44,6 +42,10 @@ print(f"All output files for Nextclade: \n {nextclade_output_files} \n")
 glycosylation_output_files = [f"output/glycosylation/flu/{lineage}/{segment}/glycosylation_sites_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for Glycosylation sites: \n {glycosylation_output_files} \n")
 
+# Create a list of output files for rule get_positions
+get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.xlsx" for lineage, segment, gene in list_of_3tuples]
+print(f"All output files for Glycosylation sites: \n {glycosylation_output_files} \n")
+
 
 
 
@@ -51,7 +53,8 @@ print(f"All output files for Glycosylation sites: \n {glycosylation_output_files
 rule all:
     input:
         nextclade_output_files,
-        glycosylation_output_files
+        glycosylation_output_files,
+        get_positions_output_files
         
 
 
@@ -91,7 +94,6 @@ def aggregate_translations(wildcards):
 
 
 
-# intermediate rule in checkpoint...
 # Create a CSV file that contains all the glycosylation sites in HA1 from the input sequences
 rule glycosylation_sites:
     input:
@@ -102,3 +104,16 @@ rule glycosylation_sites:
     script:
         "library/scripts/find_glycolysation_sites.py"
 
+
+
+# Create an Excel and CSV positions table per lineage and segment/gene.
+rule get_positions:
+    input:
+        aa_fasta = aggregate_translations,
+        positions_table = "input/positions_by_lineage_and_segment.xlsx"
+        # aa_fasta        = "output/nextalign/{lineage}/{segment}/nextalign_gene_{gene}.translation.fasta",
+    output:
+        excel_output = "output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.xlsx",
+        csv_output = "output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.csv"
+    script:
+        "library/scripts/get_positions.py"

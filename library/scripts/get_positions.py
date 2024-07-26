@@ -71,12 +71,32 @@ def generate_excel_output(output, sequence_names, amino_acid_sequences, position
         row.extend(amino_acid_sequence[pos - 1] for pos in positions)
         data.append(row)
 
-    column_names = ["Sequence"] + [f"Pos {pos}" for pos in positions]
+    column_names = ["seqName"] + [f"Pos {pos}" for pos in positions]
 
     df = pd.DataFrame(data, columns=column_names)
 
     df.to_excel(output, index=False)
 
+#########################################################################################
+#                                                                                       #
+# FUNCTION: Make an CSV file listing headers with amino acids at given positions.     #
+#                                                                                       #
+#########################################################################################
+
+
+def generate_csv_output(output, sequence_names, amino_acid_sequences, positions):
+
+    data = []
+    for sequence_name, amino_acid_sequence in zip(sequence_names, amino_acid_sequences):
+        row = [sequence_name]
+        row.extend(amino_acid_sequence[pos - 1] for pos in positions)
+        data.append(row)
+
+    column_names = ["seqName"] + [f"Pos {pos}" for pos in positions]
+
+    df = pd.DataFrame(data, columns=column_names)
+
+    df.to_csv(output, index=False)
 
 #########################################################################################
 #                                                                                       #
@@ -84,13 +104,14 @@ def generate_excel_output(output, sequence_names, amino_acid_sequences, position
 #                                                                                       #
 #########################################################################################
 
+
 #
 # -----------------------------    HEADERS & AA SEQUENCES   ----------------------------
 #
 # Set input fasta file (SNAKEFILE):
 # nextstrain.input.aa_fasta
 # '../_nextclade/output/flu_vic_ha/nextclade_gene_HA1.translation.fasta'
-aa_fasta = snakemake.input.aa_fasta
+aa_fasta = str(snakemake.input.aa_fasta)
 
 
 # Get 'aa_names' and 'aa_sequences' from input fasta file:
@@ -104,7 +125,7 @@ aa_names, aa_sequences = get_sequence_names_and_amino_acid_sequences(
 # Set 'positions' using the input Excel file and by defining filters (SNAKEFILE):
 # nextstrain.input.positions_table
 # '../input/positions_by_lineage_and_segment.xlsx'
-positions_table = snakemake.input.positions_table
+positions_table = str(snakemake.input.positions_table)
 
 filter_lineage = snakemake.wildcards.lineage  # snakemake.input.filter_lineage
 
@@ -129,6 +150,17 @@ excel_output = snakemake.output.excel_output
 if aa_names and aa_sequences:
     generate_excel_output(
         output=excel_output,
+        sequence_names=aa_names,
+        amino_acid_sequences=aa_sequences,
+        positions=filtered_positions
+    )
+
+csv_output = snakemake.output.csv_output
+
+# Create an Excel file as final output:
+if aa_names and aa_sequences:
+    generate_csv_output(
+        output=csv_output,
         sequence_names=aa_names,
         amino_acid_sequences=aa_sequences,
         positions=filtered_positions
