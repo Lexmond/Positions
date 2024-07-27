@@ -3,35 +3,44 @@ import pandas as pd
 #### JOINING THE POSITIONS TABLE WITH NEXTCLADE OUTPUT ####
 
 # Import generated Excel file from rule 'get_positions'
-excel_output = snakemake.input.excel_output
+positions_csv = snakemake.input.positions_csv
 
 # Import generated csv file from 'nextclade'
 nextclade_csv = snakemake.input.nextclade_csv
 
 # Set the path and name of the final exported Excel output file.
-excel_with_clades = snakemake.output.excel_with_clades
+positions_clades_xlsx = snakemake.output.positions_clades_xlsx
+
+# Set the path and name of the final exported CSV output file with added clades.
+positions_clades_csv = snakemake.output.positions_clades_csv
+
+# Set the path and name of the final exported CSV output file with added clades
+# with only variant positions.
+positions_clades_variants_csv = snakemake.output.positions_clades_variants_csv
+
+# positions_clades_variants_counts_csv = snakemake.output.positions_clades_variants_counts_csv
 
 
-# Read Excel sheet with pandas and store Dataframe in 'xlsx'
-xlsx = pd.read_excel(excel_output, sheet_name="Sheet1")
+# Read positions_csv with pandas and store Dataframe in 'df_positions'
+df_positions = pd.read_csv(positions_csv)
 
-# Read csv sheet with pandas and store Dataframe in 'csv'
-csv = pd.read_csv(nextclade_csv, sep=";")
+# Read csv sheet with pandas and store Dataframe in 'df_nextclade'
+df_nextclade = pd.read_csv(nextclade_csv, sep=";")
 
 # Strip whitespaces from columns names
-csv.columns = csv.columns.str.strip()
+df_nextclade.columns = df_nextclade.columns.str.strip()
 
-# Get 'seqName' and 'clade' columns from the csv data
-csv_name_clade_columns = csv[['seqName', 'clade']]
+# Get 'seqName' and 'clade' columns from df_nextclade
+csv_name_clade_columns = df_nextclade[['seqName', 'clade']]
 print(csv_name_clade_columns)
 
 # csv_name_clade_columns.rename(columns={'seqName': 'Sequence'}, inplace=True)
 # print(csv_name_clade_columns)
 
 # Join two df's by sequence name
-joined = xlsx.set_index('Sequence').join(
+joined = df_positions.set_index('seqName').join(
     csv_name_clade_columns.set_index('seqName'))
-# joined = pd.merge(xlsx, csv_name_clade_columns, on='Sequence')
+# joined = pd.merge(df_positions, csv_name_clade_columns, on='Sequence')
 
 
 # Move the 'clade' column so it is next to the sequence name
@@ -41,6 +50,8 @@ joined.insert(0, 'clade', clade_column)
 # The 'Sequence' column is returned as an index, here a normal dataframe structure is restored.
 joined = joined.reset_index()
 
+# Save the results to a CSV file
+joined.to_csv(positions_clades_csv, index=True)
 
 #### PROCESS THE DATAFRAME TO ONLY HIGHLIGHT VARIATIONS IN COLUMNS ####
 
@@ -74,23 +85,29 @@ def process_dataframe(df):
 # Get a dataframe that excluded identical columns, keeping only columns that show variation.
 processed_joined = process_dataframe(joined)
 
+# Save the results to a CSV file
+processed_joined.to_csv(positions_clades_variants_csv, index=True)
+
 #### COUNTING VARIATIONS ####
 
-# Select the 'position' columns (third to last columns) for counting
-pos_columns = processed_joined.columns[2:]
+# # Select the 'position' columns (third to last columns) for counting
+# pos_columns = processed_joined.columns[2:]
 
-# Count the variation per row in the above defined columns.
-counts = processed_joined[pos_columns].value_counts()
-print(counts)
+# # Count the variation per row in the above defined columns.
+# counts = processed_joined[pos_columns].value_counts()
+# print(counts)
+
+# # Save the results to a CSV file
+# counts.to_csv(positions_clades_variants_counts_csv, index=True)
 
 # Write dataframes 'joined' and 'processed_joined' per sheet to one excel file
-with pd.ExcelWriter(excel_with_clades) as writer:
+with pd.ExcelWriter(positions_clades_xlsx) as writer:
     joined.to_excel(
-        writer, sheet_name="raw_table", index=False)
+        writer, sheet_name="All positions", index=False)
     processed_joined.to_excel(
-        writer, sheet_name="processed_table", index=False)
-    counts.to_excel(
-        writer, sheet_name="counts")
+        writer, sheet_name="Variant positions", index=False)
+    # counts.to_excel(
+    #     writer, sheet_name="Counts of variants")
 
 # Finally, export the new Excel file with the added clade column.
 # processed_joined.to_excel(excel_with_clades, sheet_name="positions_processed")
