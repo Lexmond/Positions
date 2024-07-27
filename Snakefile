@@ -5,9 +5,14 @@ INPUT = Path("input")
 
 # Gene lookup dictionary
 GENES = {
-    "ha":  "HA1",
-    "na":  "NA",
-    "pa":  "PA",
+    "pb2": "PB2",
+    "pb1": "PB1",
+    "pa": "PA",
+    "ha": "HA1",
+    "np": "NP",
+    "na": "NA",
+    "mp": "M1",
+    "ns": "NS1",
 }
 
 # Function to scan the input folder and generate lists of lineages, segments, and genes
