@@ -102,6 +102,14 @@ def process_dataframe(df):
 # Get a dataframe that excluded identical columns, keeping only columns that show variation.
 processed_joined = process_dataframe(joined)
 
+# Concatenate all amino acids per row for each column that has the string "Pos" in the header.
+processed_joined['motif'] = processed_joined[[
+    c for c in processed_joined.columns if 'Pos' in c]].sum(axis=1)
+
+# Sort "processed_joined" by  "clade", "motif", "name".
+processed_joined = processed_joined.sort_values(
+    ['motif', 'clade', "seqName"], ascending=[True, True, True])
+
 #
 # --------------------------   Saving all output to csv files ------------------------
 #

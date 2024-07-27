@@ -149,7 +149,7 @@ filtered_positions = get_positions_from_excel(
     segment=filter_segment
 )
 
-# Create an Excel file as final output:
+# Create an CSV file as final output:
 if aa_names and aa_sequences:
     generate_csv_output(
         output=csv_output,
