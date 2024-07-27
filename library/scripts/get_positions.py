@@ -144,7 +144,7 @@ filtered_positions = get_positions_from_excel(
 # Set the name of the final output file (SNAKEFILE):
 # nextstrain.output.excel_output
 # '../output/aa_at_positions_for_vic_PA.xlsx'
-excel_output = snakemake.output.excel_output
+excel_output = snakemake.output.positions_excel
 
 # Create an Excel file as final output:
 if aa_names and aa_sequences:
@@ -155,7 +155,7 @@ if aa_names and aa_sequences:
         positions=filtered_positions
     )
 
-csv_output = snakemake.output.csv_output
+csv_output = snakemake.output.positions_csv
 
 # Create an Excel file as final output:
 if aa_names and aa_sequences:

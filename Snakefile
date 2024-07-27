@@ -65,7 +65,7 @@ checkpoint nextclade:
         fasta = "input/sequences_{lineage}_{segment}.fasta",
         dataset = "library/nextclade/data/flu/{lineage}/{segment}"
     output:
-        csv = "output/nextclade/flu/{lineage}/{segment}/nextclade.csv",
+        nextclade_csv = "output/nextclade/flu/{lineage}/{segment}/nextclade.csv",
         translations = directory("output/nextclade/flu/{lineage}/{segment}/")  # maak directory en cat om naar checkpoint...
     shell:
         """
@@ -114,7 +114,7 @@ rule get_positions:
         positions_table = "input/positions_by_lineage_and_segment.xlsx"
         # aa_fasta        = "output/nextalign/{lineage}/{segment}/nextalign_gene_{gene}.translation.fasta",
     output:
-        excel_output = "output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.xlsx",
-        csv_output = "output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.csv"
+        positions_excel = "output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.xlsx",
+        positions_csv = "output/positions/{lineage}/{segment}/positions_aa_{lineage}_{gene}.csv"
     script:
         "library/scripts/get_positions.py"
