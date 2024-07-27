@@ -126,8 +126,8 @@ rule get_positions:
 # rules.get_positions.output.positions_csv
 rule join_nextclade_and_positions:
     input:
-        nextclade_csv = "output/nextclade/flu/{lineage}/{segment}/nextclade.csv",
-        positions_csv = "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv"
+        nextclade_csv = rules.nextclade.output.nextclade_csv,  # "output/nextclade/flu/{lineage}/{segment}/nextclade.csv",
+        positions_csv = rules.get_positions.output.positions_csv  # "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv"
     output:
         positions_clades_xlsx = "output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.xlsx",
         positions_clades_csv = "output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv",
