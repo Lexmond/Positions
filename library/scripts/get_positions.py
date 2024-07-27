@@ -1,17 +1,43 @@
 import pandas as pd
 from Bio import SeqIO
 
+#
+# --------------------------   INPUT   ------------------------
+#
+
+# Translated amino acid sequence alignment from Nextclade
+aa_fasta = str(snakemake.input.aa_fasta)
+
+# Set 'positions' to look for per lineage and segment using the input Excel file
+positions_table = str(snakemake.input.positions_table)
+
+# Use Snakemake wildcards to set the lineage filter for the input Excel file.
+filter_lineage = snakemake.wildcards.lineage  # snakemake.input.filter_lineage
+
+# Use Snakemake wildcards to set the segment filter for the input Excel file.
+filter_segment = snakemake.wildcards.segment  # snakemake.input.filter_segment
+
+#
+# --------------------------   OUTPUT   ------------------------
+#
+
+# Table showing what amino acid is found on specified positions for given sequences.
+csv_output = snakemake.output.positions_csv
+
 #########################################################################################
 #                                                                                       #
 # FUNCTION: Get headers and amino acid sequences from Nextaligns output files.          #
 #                                                                                       #
 #########################################################################################
 
-# Function to get header names and amino acid sequences from Nextaligns output files
+#
 
 
 def get_sequence_names_and_amino_acid_sequences(fasta_file):
-
+    """
+    Function to get header names and amino acid sequences
+    from Nextaligns output files.
+    """
     # Read the FASTA file and extract the nucleotide sequences.
     records = list(SeqIO.parse(fasta_file, "fasta"))
 
@@ -40,7 +66,10 @@ def get_sequence_names_and_amino_acid_sequences(fasta_file):
 #########################################################################################
 
 def get_positions_from_excel(excel_file, lineage, segment):
-
+    """
+    Get a list of positions of interest for sequences from
+    lineage and segment of interest.
+    """
     # Import pandas
     import pandas as pd
 
@@ -64,7 +93,9 @@ def get_positions_from_excel(excel_file, lineage, segment):
 #########################################################################################
 
 def generate_excel_output(output, sequence_names, amino_acid_sequences, positions):
-
+    """
+    Make an Excel file listing headers with amino acids at given positions.
+    """
     data = []
     for sequence_name, amino_acid_sequence in zip(sequence_names, amino_acid_sequences):
         row = [sequence_name]
@@ -85,7 +116,9 @@ def generate_excel_output(output, sequence_names, amino_acid_sequences, position
 
 
 def generate_csv_output(output, sequence_names, amino_acid_sequences, positions):
-
+    """
+    Make an CSV file listing headers with amino acids at given positions.
+    """
     data = []
     for sequence_name, amino_acid_sequence in zip(sequence_names, amino_acid_sequences):
         row = [sequence_name]
@@ -105,31 +138,9 @@ def generate_csv_output(output, sequence_names, amino_acid_sequences, positions)
 #########################################################################################
 
 
-#
-# -----------------------------    HEADERS & AA SEQUENCES   ----------------------------
-#
-# Set input fasta file (SNAKEFILE):
-# nextstrain.input.aa_fasta
-# '../_nextclade/output/flu_vic_ha/nextclade_gene_HA1.translation.fasta'
-aa_fasta = str(snakemake.input.aa_fasta)
-
-
 # Get 'aa_names' and 'aa_sequences' from input fasta file:
 aa_names, aa_sequences = get_sequence_names_and_amino_acid_sequences(
     fasta_file=aa_fasta)
-
-
-#
-# --------------------------    FILTER POSITIONS OF INTEREST   ------------------------
-#
-# Set 'positions' using the input Excel file and by defining filters (SNAKEFILE):
-# nextstrain.input.positions_table
-# '../input/positions_by_lineage_and_segment.xlsx'
-positions_table = str(snakemake.input.positions_table)
-
-filter_lineage = snakemake.wildcards.lineage  # snakemake.input.filter_lineage
-
-filter_segment = snakemake.wildcards.segment  # snakemake.input.filter_segment
 
 # Get the input positions from the input excel_file that are filtered by lineage and segment:
 filtered_positions = get_positions_from_excel(
@@ -137,25 +148,6 @@ filtered_positions = get_positions_from_excel(
     lineage=filter_lineage,
     segment=filter_segment
 )
-
-#
-# -------------------------    CREATE OUTPUT EXCEL FILE   -----------------------------
-#
-# Set the name of the final output file (SNAKEFILE):
-# nextstrain.output.excel_output
-# '../output/aa_at_positions_for_vic_PA.xlsx'
-excel_output = snakemake.output.positions_excel
-
-# Create an Excel file as final output:
-if aa_names and aa_sequences:
-    generate_excel_output(
-        output=excel_output,
-        sequence_names=aa_names,
-        amino_acid_sequences=aa_sequences,
-        positions=filtered_positions
-    )
-
-csv_output = snakemake.output.positions_csv
 
 # Create an Excel file as final output:
 if aa_names and aa_sequences:
@@ -165,3 +157,20 @@ if aa_names and aa_sequences:
         amino_acid_sequences=aa_sequences,
         positions=filtered_positions
     )
+
+#
+# -------------------------    CREATE OUTPUT EXCEL FILE   -----------------------------
+#
+# Set the name of the final output file (SNAKEFILE):
+# nextstrain.output.excel_output
+# '../output/aa_at_positions_for_vic_PA.xlsx'
+# excel_output = snakemake.output.positions_excel
+
+# # Create an Excel file as final output:
+# if aa_names and aa_sequences:
+#     generate_excel_output(
+#         output=excel_output,
+#         sequence_names=aa_names,
+#         amino_acid_sequences=aa_sequences,
+#         positions=filtered_positions
+#     )

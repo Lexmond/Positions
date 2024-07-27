@@ -44,7 +44,7 @@ glycosylation_sites_output_files = [f"output/glycosylation/flu/{lineage}/{segmen
 print(f"All output files for rule 'glycosylation_sites': \n {glycosylation_sites_output_files} \n")
 
 # Create a list of output files for rule get_positions
-get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.xlsx" for lineage, segment, gene in list_of_3tuples]
+get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'get_positions': \n {get_positions_output_files} \n")
 
 join_nextclade_and_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
@@ -100,7 +100,7 @@ def aggregate_translations(wildcards):
 # Create a CSV file that contains all the glycosylation sites in HA1 from the input sequences
 rule glycosylation_sites:
     input:
-        aggregate_translations
+        aa_fasta = aggregate_translations
         # fasta_translated = "output/nextclade/flu/{lineage}/{segment}/nextclade.cds_translation.{gene}.fasta"
     output:
         glycosylation_csv = "output/glycosylation/flu/{lineage}/{segment}/glycosylation_sites_{gene}.csv"
@@ -114,9 +114,7 @@ rule get_positions:
     input:
         aa_fasta = aggregate_translations,
         positions_table = "input/positions_by_lineage_and_segment.xlsx"
-        # aa_fasta        = "output/nextalign/{lineage}/{segment}/nextalign_gene_{gene}.translation.fasta",
     output:
-        positions_excel = "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.xlsx",
         positions_csv = "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv"
     script:
         "library/scripts/get_positions.py"
@@ -129,9 +127,7 @@ rule join_nextclade_and_positions:
         nextclade_csv = rules.nextclade.output.nextclade_csv,  # "output/nextclade/flu/{lineage}/{segment}/nextclade.csv",
         positions_csv = rules.get_positions.output.positions_csv  # "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv"
     output:
-        positions_clades_xlsx = "output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.xlsx",
         positions_clades_csv = "output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv",
         positions_clades_variants_csv = "output/positions/{lineage}/{segment}/positions_clades_variants_{lineage}_{gene}.csv"
-        # positions_clades_variants_counts_csv = "output/positions/{lineage}/{segment}/positions_clades_variants_count{lineage}_{gene}.csv"
     script:
         "library/scripts/join_nextclade_and_positions.py"

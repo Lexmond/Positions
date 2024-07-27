@@ -4,7 +4,7 @@ import re
 
 # Input from Snakefile
 # Note that the input from aggregate_translations needs to be converted to a string for SeqIO to work.
-ha_sequences = str(snakemake.input)
+ha_sequences = str(snakemake.input.aa_fasta)
 
 # Output file for Snakefile
 glycosylation_csv = snakemake.output.glycosylation_csv
