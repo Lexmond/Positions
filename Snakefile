@@ -118,7 +118,7 @@ rule glycosylation_sites:
 rule get_positions:
     input:
         aa_fasta = aggregate_translations,
-        positions_table = "input/positions_by_lineage_and_segment.xlsx"
+        positions_table = "input/aa_positions_of_interest.xlsx"
     output:
         positions_csv = "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv"
     script:

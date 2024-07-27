@@ -36,6 +36,9 @@ df = df.reindex(sorted(df.columns, key=int), axis=1)
 # Set the name of the index column
 df.index.name = "seqName"
 
+# Rename the columns by adding "Pos " to the existing values
+df.columns = [f"Pos {col}" if col != 'seqName' else col for col in df.columns]
+
 # Display the DataFrame
 print(df)
 
