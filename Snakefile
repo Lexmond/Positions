@@ -40,38 +40,39 @@ list_of_2tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign
 list_of_3tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign['segment'], input_data_nextalign['gene']))
 
 
-# Create a list of output files for rule nextclade
+# Create a list of output files used rule "nextclade"
 nextclade_output_files = [f"output/nextclade/flu/{lineage}/{segment}/nextclade.csv" for lineage, segment in list_of_2tuples]
 print(f"All output files for 'checkpoint nextclade': \n {nextclade_output_files} \n")
 
-# Create a list of output files for rule glycosylation_sites
-glycosylation_sites_output_files = [f"output/glycosylation/{lineage}/{segment}/glycosylation_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
-print(f"All output files for rule 'glycosylation_sites': \n {glycosylation_sites_output_files} \n")
-
-# Create a list of output files for rule get_positions
+# Create a list of output files used by rule "get_positions"
 get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'get_positions': \n {get_positions_output_files} \n")
 
-# join_nextclade_and_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
-# print(f"All output files for rule 'join_nextclade_and_positions': \n {join_nextclade_and_positions_output_files} \n")
+# Create a list of output files used by rule "get_glycosylation"
+get_glycosylation_output_files = [f"output/glycosylation/{lineage}/{segment}/glycosylation_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
+print(f"All output files for rule 'get_glycosylation': \n {get_glycosylation_output_files} \n")
 
+# Merge the output files from "nextclade" and "get_positions"
 merge_positions_nextclade_output_files = [f"output/positions/{lineage}/{segment}/positions_nextclade_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'merge_positions_nextclade': \n {merge_positions_nextclade_output_files} \n")
 
+# Merge the output files from "nextclade" and "get_glycosylation"
 merge_glycosylation_nextclade_output_files = [f"output/glycosylation/{lineage}/{segment}/glycosylation_nextclade_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'merge_glycosylation_nextclade': \n {merge_glycosylation_nextclade_output_files} \n")
+
+
+# join_nextclade_and_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
+# print(f"All output files for rule 'join_nextclade_and_positions': \n {join_nextclade_and_positions_output_files} \n")
 
 
 # Snakemake rules
 rule all:
     input:
         nextclade_output_files,
-        glycosylation_sites_output_files,
+        get_glycosylation_output_files,
         get_positions_output_files,
         merge_positions_nextclade_output_files,
         merge_glycosylation_nextclade_output_files
-
-        
 
 
 # Run Nextclade datasets on the input sequences to get outputs per subtype and segment 
@@ -89,8 +90,6 @@ checkpoint nextclade:
             --output-all=output/nextclade/flu/{wildcards.lineage}/{wildcards.segment} \
             {input.fasta}
         """
-
-
 
 def aggregate_translations(wildcards):
     """The alignment rule produces multiple outputs that we cannot easily name prior
@@ -110,15 +109,14 @@ def aggregate_translations(wildcards):
 
 # Look for glycosylation sites per sequences
 # Create a positions table per sequence, save to CSV..
-rule glycosylation_sites:
+rule get_glycosylation:
     input:
         aa_fasta = aggregate_translations
         # fasta_translated = "output/nextclade/flu/{lineage}/{segment}/nextclade.cds_translation.{gene}.fasta"
     output:
         glycosylation_csv = "output/glycosylation/{lineage}/{segment}/glycosylation_{lineage}_{gene}.csv"
     script:
-        "library/scripts/find_glycolysation_sites.py"
-
+        "library/scripts/get_glycolysation.py"
 
 # Create a positions table per sequence, save to CSV..
 rule get_positions:
@@ -129,7 +127,6 @@ rule get_positions:
         positions_csv = "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv"
     script:
         "library/scripts/get_positions.py"
-
 
 # Merge clade-data from nextstrain and add it to the positions data.
 rule merge_positions_nextclade:
@@ -145,7 +142,7 @@ rule merge_positions_nextclade:
 rule merge_glycosylation_nextclade:
     input:
         nextclade_csv = rules.nextclade.output.nextclade_csv,  # "output/nextclade/flu/{lineage}/{segment}/nextclade.csv",
-        glycosylation_csv = rules.glycosylation_sites.output.glycosylation_csv # "output/glycosylation/flu/{lineage}/{segment}/glycosylation_sites_{gene}.csv"
+        glycosylation_csv = rules.get_glycosylation.output.glycosylation_csv # "output/glycosylation/{lineage}/{segment}/glycosylation_{lineage}_{gene}.csv"
     output:
         merged_csv = "output/glycosylation/{lineage}/{segment}/glycosylation_nextclade_{lineage}_{gene}.csv"
     script:
