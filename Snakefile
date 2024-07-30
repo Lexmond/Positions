@@ -42,7 +42,7 @@ list_of_3tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign
 # Create a list of output files used rule "nextclade"
 nextclade_output_files = [f"output/nextclade/flu/{lineage}/{segment}/nextclade.csv" \
 for lineage, segment in list_of_2tuples]
-print(f"All output files for 'checkpoint nextclade': \n {nextclade_output_files} \n")
+print(f"All output files for checkpoint 'nextclade': \n {nextclade_output_files} \n")
 
 # Create a list of output files used by rule "get_positions"
 get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv" \
