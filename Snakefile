@@ -1,9 +1,9 @@
 from pathlib import Path
 
-# Directory 'input' path
+# Pth of the 'input' directory
 INPUT = Path("input")
 
-# Gene lookup dictionary
+# Gene lookup dictionary by seqments
 GENES = {
     "pb2": "PB2",
     "pb1": "PB1",
@@ -20,7 +20,7 @@ def input_func_nextalign():
     l1, l2, l3 = [], [], []
     for path in list(INPUT.glob("*.fasta")):
         _, lineage, segment = path.stem.split('_')  # sequences_h1n1pdm_ha.fasta
-        gene = GENES[segment]  # Get gene variable from dict
+        gene = GENES[segment]  # Get gene variable from dict by segment
         l1.append(lineage)
         l2.append(segment)
         l3.append(gene)
@@ -32,7 +32,6 @@ def input_func_nextalign():
 
 # Get input data dictionary as a dictionary of lists
 input_data_nextalign = input_func_nextalign()
-
 
 
 # Create lists of tuples that can be used to extract zipped values from the different lists
@@ -69,9 +68,6 @@ print(f"All output files for rule 'merge_glycosylation_nextclade': \n {merge_gly
 merge_positions_nextclade_glycosylation_output_files = [f"output/positions/{lineage}/{segment}/positions_nextclade_glycosylation_{lineage}_{gene}.csv" \
 for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'merge_positions_nextclade_glycosylation': \n {merge_positions_nextclade_glycosylation_output_files} \n")
-
-# join_nextclade_and_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
-# print(f"All output files for rule 'join_nextclade_and_positions': \n {join_nextclade_and_positions_output_files} \n")
 
 
 # Snakemake rules
