@@ -41,25 +41,34 @@ list_of_3tuples = list(zip(input_data_nextalign['lineage'], input_data_nextalign
 
 
 # Create a list of output files used rule "nextclade"
-nextclade_output_files = [f"output/nextclade/flu/{lineage}/{segment}/nextclade.csv" for lineage, segment in list_of_2tuples]
+nextclade_output_files = [f"output/nextclade/flu/{lineage}/{segment}/nextclade.csv" \
+for lineage, segment in list_of_2tuples]
 print(f"All output files for 'checkpoint nextclade': \n {nextclade_output_files} \n")
 
 # Create a list of output files used by rule "get_positions"
-get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
+get_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv" \
+for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'get_positions': \n {get_positions_output_files} \n")
 
 # Create a list of output files used by rule "get_glycosylation"
-get_glycosylation_output_files = [f"output/glycosylation/{lineage}/{segment}/glycosylation_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
+get_glycosylation_output_files = [f"output/glycosylation/{lineage}/{segment}/glycosylation_{lineage}_{gene}.csv" \
+for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'get_glycosylation': \n {get_glycosylation_output_files} \n")
 
-# Merge the output files from "nextclade" and "get_positions"
-merge_positions_nextclade_output_files = [f"output/positions/{lineage}/{segment}/positions_nextclade_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
+# Merge the output files from rules "nextclade" and "get_positions"
+merge_positions_nextclade_output_files = [f"output/positions/{lineage}/{segment}/positions_nextclade_{lineage}_{gene}.csv" \
+for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'merge_positions_nextclade': \n {merge_positions_nextclade_output_files} \n")
 
-# Merge the output files from "nextclade" and "get_glycosylation"
-merge_glycosylation_nextclade_output_files = [f"output/glycosylation/{lineage}/{segment}/glycosylation_nextclade_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
+# Merge the output files from rules "nextclade" and "get_glycosylation"
+merge_glycosylation_nextclade_output_files = [f"output/glycosylation/{lineage}/{segment}/glycosylation_nextclade_{lineage}_{gene}.csv" \
+for lineage, segment, gene in list_of_3tuples]
 print(f"All output files for rule 'merge_glycosylation_nextclade': \n {merge_glycosylation_nextclade_output_files} \n")
 
+# Merge the output files from rules "merge_positions_nextclade" and "merge_glycosylation_nextclade"
+merge_positions_nextclade_glycosylation_output_files = [f"output/positions/{lineage}/{segment}/positions_nextclade_glycosylation_{lineage}_{gene}.csv" \
+for lineage, segment, gene in list_of_3tuples]
+print(f"All output files for rule 'merge_positions_nextclade_glycosylation': \n {merge_positions_nextclade_glycosylation_output_files} \n")
 
 # join_nextclade_and_positions_output_files = [f"output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv" for lineage, segment, gene in list_of_3tuples]
 # print(f"All output files for rule 'join_nextclade_and_positions': \n {join_nextclade_and_positions_output_files} \n")
@@ -72,7 +81,8 @@ rule all:
         get_glycosylation_output_files,
         get_positions_output_files,
         merge_positions_nextclade_output_files,
-        merge_glycosylation_nextclade_output_files
+        merge_glycosylation_nextclade_output_files,
+        merge_positions_nextclade_glycosylation_output_files
 
 
 # Run Nextclade datasets on the input sequences to get outputs per subtype and segment 
@@ -148,15 +158,11 @@ rule merge_glycosylation_nextclade:
     script:
         "library/scripts/merge_glycosylation_nextclade_csv.py"
 
-
-# Merge the clade data from rules.nextclade.output.nextclade_csv with data in 
-# rules.get_positions.output.positions_csv
-# rule join_nextclade_and_positions:
-#     input:
-#         nextclade_csv = rules.nextclade.output.nextclade_csv,  # "output/nextclade/flu/{lineage}/{segment}/nextclade.csv",
-#         positions_csv = rules.get_positions.output.positions_csv  # "output/positions/{lineage}/{segment}/positions_{lineage}_{gene}.csv"
-#     output:
-#         positions_clades_csv = "output/positions/{lineage}/{segment}/positions_clades_{lineage}_{gene}.csv",
-#         positions_clades_variants_csv = "output/positions/{lineage}/{segment}/positions_clades_variants_{lineage}_{gene}.csv"
-#     script:
-#         "library/scripts/join_nextclade_and_positions.py"
+rule merge_positions_nextclade_glycosylation:
+    input: 
+        positions_merged_csv = rules.merge_positions_nextclade.output.merged_csv, # "output/positions/{lineage}/{segment}/positions_nextclade_{lineage}_{gene}.csv"
+        glycosylation_merged_csv = rules.merge_glycosylation_nextclade.output.merged_csv # "output/glycosylation/{lineage}/{segment}/glycosylation_nextclade_{lineage}_{gene}.csv"
+    output:
+        merged_csv = "output/positions/{lineage}/{segment}/positions_nextclade_glycosylation_{lineage}_{gene}.csv"
+    script:
+        "library/scripts/merge_positions_nextclade_glycosylation.py"
