@@ -16,6 +16,9 @@ glycosylation_merged_csv = snakemake.input.glycosylation_merged_csv
 # "../../output/positions/h1n1pdm/ha/positions_nextclade_glycosylation_h1n1pdm_HA1.csv"
 merged_csv = snakemake.output.merged_csv
 
+# "../../output/positions/h1n1pdm/ha/positions_nextclade_glycosylation_counts_h1n1pdm_HA1.csv"
+counts_csv = snakemake.output.counts_csv
+
 #
 # --------------------------   Prepare Dataframes   ------------------------
 #
@@ -48,8 +51,16 @@ if "short-clade_pos" in df.columns:
 if "subclade_pos" in df.columns:
     df = df.rename(columns={"subclade_pos": "subclade"})
 
-
 print(df.head())
+
+
+# Counts per seqment
+df_count_seqName_per_motif = df.groupby(["motif_pos", "motif_gly", "clade"])[
+    ["seqName"]].count().sort_values(by="seqName", ascending=False)
+
+print(df_count_seqName_per_motif)
+
+print(f"Total count of seqName: {df_count_seqName_per_motif["seqName"].sum()}")
 
 #
 # --------------------------   Save Dataframes   ------------------------
@@ -57,3 +68,5 @@ print(df.head())
 
 # Save the results to CSV.
 df.to_csv(merged_csv, index=True)
+
+df_count_seqName_per_motif.to_csv(counts_csv, index=True)

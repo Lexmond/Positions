@@ -159,6 +159,7 @@ rule merge_positions_nextclade_glycosylation:
         positions_merged_csv = rules.merge_positions_nextclade.output.merged_csv, # "output/positions/{lineage}/{segment}/positions_nextclade_{lineage}_{gene}.csv"
         glycosylation_merged_csv = rules.merge_glycosylation_nextclade.output.merged_csv # "output/glycosylation/{lineage}/{segment}/glycosylation_nextclade_{lineage}_{gene}.csv"
     output:
-        merged_csv = "output/positions/{lineage}/{segment}/positions_nextclade_glycosylation_{lineage}_{gene}.csv"
+        merged_csv = "output/positions/{lineage}/{segment}/positions_nextclade_glycosylation_{lineage}_{gene}.csv",
+        counts_csv = "output/positions/{lineage}/{segment}/positions_nextclade_glycosylation_counts_{lineage}_{gene}.csv"
     script:
         "library/scripts/merge_positions_nextclade_glycosylation.py"
